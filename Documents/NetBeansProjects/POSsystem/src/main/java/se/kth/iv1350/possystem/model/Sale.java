@@ -8,6 +8,7 @@ import se.kth.iv1350.possystem.integration.ItemDTO;
 public class Sale {
     private ItemDTO[] itemList;
     private int amountOfItems;
+    private int currentMax;
     private double totalPrice;
     private double totalRawPrice;
     private double totalVAT;
@@ -20,6 +21,7 @@ public class Sale {
     public Sale(int customerID) {
         this.itemList = new ItemDTO[100];
         this.amountOfItems = 0;
+        this.currentMax = 100;
         this.totalPrice = 0;
         this.totalRawPrice = 0;
         this.totalVAT = 0;
@@ -32,6 +34,10 @@ public class Sale {
     @param item The item(s) to add to the current sale.    
     */
     public void updateSale(ItemDTO item) {
+        if (this.amountOfItems == currentMax) {
+            this.itemList = this.increaseBasketMax(itemList, this.currentMax);
+            this.currentMax = this.currentMax * 2;
+        }
         this.itemList[this.amountOfItems] = item;
         this.totalRawPrice += item.getPrice() * item.getAmount();
         this.totalPrice += (item.getPrice() * (1 + item.getVAT())) * item.getAmount();
@@ -69,8 +75,19 @@ public class Sale {
         return new ReceiptDTO(amountPaid, change, saleInfo);
     }
     
+    /*
+    Ends the sale and returns the current sale information, and recalculates the final price.
+    
+    @return The final state of the sale.
+    */
     public SaleDTO finalizeSale() {
         this.totalPrice = (double) Math.round(100 * (this.totalVAT + this.totalRawPrice - this.discountSum)) / 100;
         return getSaleDTO();
+    }
+    
+    private ItemDTO[] increaseBasketMax(ItemDTO[] itemList, int max) {
+        ItemDTO[] newList = new ItemDTO[max * 2];
+        System.arraycopy(itemList, 0, newList, 0, max);
+        return newList;
     }
 }

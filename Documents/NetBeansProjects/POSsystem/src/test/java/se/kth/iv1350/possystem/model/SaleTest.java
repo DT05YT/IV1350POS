@@ -75,8 +75,6 @@ public class SaleTest {
         ReceiptDTO expResult = new ReceiptDTO(0, 0 - instance.getSaleDTO().getTotalPrice(), instance.getSaleDTO());
         ReceiptDTO result = instance.generateReceipt(0);
         
-        System.out.println(result.getAmountPaid() + " : " + result.getChange() + " . " + result.getSaleInfo().getTotalPrice());
-        System.out.println(expResult.getAmountPaid() + " : " + expResult.getChange());
         assertEquals(expResult.getChange(), result.getChange(), "The simulated receiptDTO calculated change to be the same as the real receiptDTO.");
     }
 
