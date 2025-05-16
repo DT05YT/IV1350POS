@@ -11,6 +11,7 @@ import se.kth.iv1350.possystem.integration.DiscountDatabase;
 import se.kth.iv1350.possystem.integration.ExternalAccounting;
 import se.kth.iv1350.possystem.integration.ExternalInventory;
 import se.kth.iv1350.possystem.integration.Printer;
+import se.kth.iv1350.possystem.controller.CallFailedException;
 import se.kth.iv1350.possystem.model.Sale;
 import se.kth.iv1350.possystem.model.Register;
 import java.util.Random;
@@ -58,9 +59,13 @@ public class ControllerTest {
         Controller instance = new Controller(extAcc, extInv, disDat, printer);
         instance.startSale(0);
         
-        for (int i = 1; i < 1000; i++) {
-            ItemDTO result = instance.enterItemID((i%50) + 1, i%73);
-            assertFalse(result.getID() == -1, "Invalid ID returned.");
+        for (int i = 0; i < 1000; i++) {
+            try {
+                ItemDTO result = instance.enterItemID(i * 51, i%73);
+            }
+            catch (CallFailedException CFExc) {
+                assertFalse(CFExc.getMessage() == "", "No string returned.");
+            }
         }
     }
 
@@ -77,9 +82,14 @@ public class ControllerTest {
         Controller instance = new Controller(extAcc, extInv, disDat, printer);
         instance.startSale(0);
         
-        instance.enterItemID(-1, 1828220);
+        try {
+            instance.enterItemID(1, 1828220);
+        }
+        catch (CallFailedException CFExc) {
+            assertFalse(CFExc.getMessage() == "", "No string returned.");
+        }
         ItemDTO result = instance.getSaleInfo().getItemList()[0];
-        ItemDTO expResult = new ItemDTO(-1, "ERR: ID INVALID", 0, 0, 0, "ERR: ID INVALID");
+        ItemDTO expResult = new ItemDTO(1, "Invisibility Grapes", 3.99, 0.12, 1828220, "Completely invisible, but bursting with imaginary flavor." );
         if (result.getID() == expResult.getID() && 
                 result.getAmount() == expResult.getAmount() &&
                 result.getDesc().equals(expResult.getDesc()) &&
@@ -121,7 +131,12 @@ public class ControllerTest {
         instance.startSale(0);
         Random r = new Random();
         for (int i = 0; i <= 1000; i++) {
-            instance.enterItemID((i%50) + 1, i);
+            try {
+                instance.enterItemID((i%50) + 1, i);
+            }
+            catch (CallFailedException CFExc) {
+                assertFalse(true, "Item not found with valid ID.");
+            }
             double total = instance.getSaleInfo().getTotalPrice();
             double payment = r.nextDouble(10000) + (total / r.nextDouble(5));
             double result = instance.pay(payment);

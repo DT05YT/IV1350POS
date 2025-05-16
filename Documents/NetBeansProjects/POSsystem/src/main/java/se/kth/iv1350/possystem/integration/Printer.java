@@ -41,6 +41,8 @@ public class Printer {
             System.out.printf(format, "Discount:", discount);
         }
         System.out.printf(format, "Total:", sale.getTotalPrice());
+        System.out.printf(format, "Amount Paid:", receipt.getAmountPaid());
+        System.out.printf(format, "Change:", receipt.getChange());
     }
     private void printReceiptHeader() {
         String label = "[RECEIPT]";

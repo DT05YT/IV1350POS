@@ -64,13 +64,16 @@ public class ExternalInventory {
     
     @param ID The ID of the looked after item.
     @param quantity The amount of items being bought.
+    @throws ItemNotFoundException If the item does not exist.
+    @throws DataBaseNotOnlineException If the database is not online (simulated)
     */
-    public ItemDTO getItem(int ID, int quantity) {
+    public ItemDTO getItem(int ID, int quantity) throws ItemNotFoundException, DatabaseNotOnlineException {
+        if (ID == 1001) {throw new DatabaseNotOnlineException();} //Should be replaced with actual online call in a real situation.
         for (ItemDTO item : this.inventory) {
             if (item.getID() == ID) {
                 return new ItemDTO(ID, item.getName(), item.getPrice(), item.getVAT(), quantity, item.getDesc());
             }
         }
-        return new ItemDTO(-1, "ERR: ID INVALID", 0, 0, 0, "ERR: ID INVALID");
+        throw new ItemNotFoundException(ID);
     }
 }

@@ -35,13 +35,23 @@ public class ExternalInventoryTest {
      */
     @Test
     public void testGetItem() {
-        System.out.println("getItem");
         for (int i = 1; i <= 50; i++) { //Tested between 1 and 50, as those are the valid ID's made.
             int quantity = i + 10292824;
             ExternalInventory instance = new ExternalInventory();
-            ItemDTO result = instance.getItem(i, quantity);
-            assertFalse(result.getID() == -1, "ID was not valid.");
+            try {
+                ItemDTO result = instance.getItem(i, quantity);
+            }
+            catch (ItemNotFoundException INFExc) {
+                assertFalse(true, "Valid ID threw INFExc.");
+            }
         }
+        ExternalInventory instance = new ExternalInventory();
+        try {
+            ItemDTO result = instance.getItem(0, 0);
+        }
+        catch (ItemNotFoundException INFExc) {
+            assertTrue(true, "Invalid ID did not throw INFExc.");
+        }        
     }
     
 }

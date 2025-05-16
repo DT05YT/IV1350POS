@@ -2,24 +2,26 @@ package se.kth.iv1350.possystem.controller;
 import se.kth.iv1350.possystem.integration.ItemDTO;
 import se.kth.iv1350.possystem.model.SaleDTO;
 import se.kth.iv1350.possystem.model.ReceiptDTO;
+import se.kth.iv1350.possystem.model.Sale;
+import se.kth.iv1350.possystem.model.Register;
+import se.kth.iv1350.possystem.model.RevenueObserver;
 import se.kth.iv1350.possystem.integration.DiscountDatabase;
 import se.kth.iv1350.possystem.integration.ExternalAccounting;
 import se.kth.iv1350.possystem.integration.ExternalInventory;
 import se.kth.iv1350.possystem.integration.Printer;
-import se.kth.iv1350.possystem.model.Sale;
-import se.kth.iv1350.possystem.model.Register;
+import se.kth.iv1350.possystem.integration.ItemNotFoundException;
 /**
  *
  * @author Digit
  */
 public class Controller {
     
-    private ExternalAccounting extAcc;
-    private ExternalInventory extInv;
-    private DiscountDatabase disDat;
+    private final ExternalAccounting extAcc;
+    private final ExternalInventory extInv;
+    private final DiscountDatabase disDat;
+    private final Printer printer;
+    private final Register register;
     private Sale sale;
-    private Printer printer;
-    private Register register;
     
     public Controller(ExternalAccounting extAcc, ExternalInventory extInv, DiscountDatabase disDat, Printer printer) {
         this.extAcc = extAcc;
@@ -43,11 +45,17 @@ public class Controller {
     @param ID The ID of the item that was scanned or entered.
     @param quantity The amount of items scanned or entered.
     @return An ItemDTO that corresponds to the ID entered, with the quantity entered.
+    @throws CallFailedException when a call fails due to a higher up error.
     */
-    public ItemDTO enterItemID(int ID, int quantity) {
-        ItemDTO item = extInv.getItem(ID, quantity);
-        sale.updateSale(item);
-        return item;
+    public ItemDTO enterItemID(int ID, int quantity) throws CallFailedException {
+        try {
+            ItemDTO item = extInv.getItem(ID, quantity);
+            sale.updateSale(item);
+            return item;
+        }
+        catch (ItemNotFoundException INFExc) {
+            throw new CallFailedException("Item ID invalid", INFExc);
+        }
     }
     /*
     Gets a saleDTO and returns it.
@@ -92,5 +100,15 @@ public class Controller {
         SaleDTO saleInfo = sale.finalizeSale();
         double total = saleInfo.getTotalPrice();
         return total;
+    }
+    
+    /**
+     * Adds the given RevenueObserver to the list in sale, to be updated with
+     * total revenue when sale ends.
+     * 
+     * @param revObv the revenue observer to add.
+     */
+    public void addRevenueObserver(RevenueObserver revObv) {
+        this.sale.addRevenueObserver(revObv);
     }
 }

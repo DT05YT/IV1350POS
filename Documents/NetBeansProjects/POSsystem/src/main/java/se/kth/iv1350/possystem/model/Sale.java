@@ -1,5 +1,7 @@
 package se.kth.iv1350.possystem.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import se.kth.iv1350.possystem.integration.ItemDTO;
 /**
  *
@@ -15,6 +17,8 @@ public class Sale {
     private final int customerID;
     private double discountSum;
     
+    private List<RevenueObserver> revenueObservers;
+    
     /*
     Creates a Sale object.
     */
@@ -27,6 +31,7 @@ public class Sale {
         this.totalVAT = 0;
         this.customerID = customerID;
         this.discountSum = 0;
+        this.revenueObservers = new ArrayList<>();
     }
     /*
     Updates the current sale.
@@ -82,6 +87,9 @@ public class Sale {
     */
     public SaleDTO finalizeSale() {
         this.totalPrice = (double) Math.round(100 * (this.totalVAT + this.totalRawPrice - this.discountSum)) / 100;
+        for (RevenueObserver revObs : this.revenueObservers) {
+            revObs.updateObserversWithRevenue(this.totalPrice);
+        }
         return getSaleDTO();
     }
     
@@ -89,5 +97,9 @@ public class Sale {
         ItemDTO[] newList = new ItemDTO[max * 2];
         System.arraycopy(itemList, 0, newList, 0, max);
         return newList;
+    }
+    
+    public void addRevenueObserver(RevenueObserver revObs) {
+        this.revenueObservers.add(revObs);
     }
 }
