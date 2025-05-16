@@ -4,6 +4,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import se.kth.iv1350.possystem.model.SaleDTO;
 
 /**
@@ -52,6 +53,12 @@ public class ExternalInventoryTest {
         catch (ItemNotFoundException INFExc) {
             assertTrue(true, "Invalid ID did not throw INFExc.");
         }        
+    }
+    
+    @Test
+    public void testDatabaseNotOnlineException() {
+        ExternalInventory instance = new ExternalInventory();
+        assertThrows(DatabaseNotOnlineException.class, () -> {instance.getItem(1001, 0);});
     }
     
 }
