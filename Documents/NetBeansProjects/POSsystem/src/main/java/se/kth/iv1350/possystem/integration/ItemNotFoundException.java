@@ -9,6 +9,10 @@ import se.kth.iv1350.possystem.model.Logger;
  * @param ID the problematic ID.
  */
 public class ItemNotFoundException extends Exception {
+    /**
+     * Throws a checked exception that displays that the ID was invalid.
+     * @param ID the invalid ID.
+     */
     public ItemNotFoundException(int ID) {
         super("Item ID [" + ID + "] could not be found in database.");
         logError("Item ID [" + ID + "] could not be found in database.");

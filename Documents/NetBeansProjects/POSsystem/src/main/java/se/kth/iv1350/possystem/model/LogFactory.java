@@ -16,7 +16,7 @@ public class LogFactory {
     }
     /**
      * Gives out the created LogFactory so that no more than one is created.
-     * @return 
+     * @return LogFactory the created LogFactory.
      */
     public static LogFactory getLogFactory() {
         return factory;
